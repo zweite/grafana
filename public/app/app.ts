@@ -29,6 +29,7 @@ _.move = (array, fromIndex, toIndex) => {
 import { coreModule, angularModules } from 'app/core/core_module';
 import { registerAngularDirectives } from 'app/core/core';
 import { setupAngularRoutes } from 'app/routes/routes';
+import { addWebkitScrollbarStyles } from 'app/core/utils/addWebkitScrollbarStyles';
 
 import 'app/routes/GrafanaCtrl';
 import 'app/features/all';
