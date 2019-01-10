@@ -1,7 +1,6 @@
 import css from 'dom-css';
 let scrollbarWidth = false;
 
-
 export default function getScrollbarWidth() {
     if (scrollbarWidth !== false) return scrollbarWidth;
     /* istanbul ignore else */
@@ -27,5 +26,6 @@ export default function getScrollbarWidth() {
 export function addWebkitScrollbarStyles() {
   setTimeout(function() {
 
-  });
+
+  }, 10);
 }
