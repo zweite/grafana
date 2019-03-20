@@ -9,6 +9,7 @@ import { Graph } from 'app/core/utils/dag';
 import { TemplateSrv } from 'app/features/templating/template_srv';
 import { TimeSrv } from 'app/features/dashboard/services/TimeSrv';
 import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
+import { store } from 'app/store/store';
 
 // Types
 import { TimeRange } from '@grafana/ui/src';
@@ -24,12 +25,13 @@ export class VariableSrv {
     private $injector,
     private templateSrv: TemplateSrv,
     private timeSrv: TimeSrv
-  ) {}
+  ) { }
 
   init(dashboard: DashboardModel) {
     this.dashboard = dashboard;
     this.dashboard.events.on('time-range-updated', this.onTimeRangeUpdated.bind(this));
     this.dashboard.events.on('template-variable-value-updated', this.updateUrlParamsWithCurrentVariables.bind(this));
+    store.subscribe(() => this.storeUpdated());
 
     // create working class models representing variables
     this.variables = dashboard.templating.list = dashboard.templating.list.map(this.createVariableFromModel.bind(this));
@@ -85,14 +87,22 @@ export class VariableSrv {
       .then(() => {
         const urlValue = queryParams['var-' + variable.name];
         if (urlValue !== void 0) {
-          return variable.setValueFromUrl(urlValue).then(variable.initLock.resolve);
+          if (variable.initLock) {
+            return variable.setValueFromUrl(urlValue).then(variable.initLock.resolve);
+          }
+          return variable.setValueFromUrl(urlValue);
         }
 
         if (variable.refresh === 1 || variable.refresh === 2) {
-          return variable.updateOptions().then(variable.initLock.resolve);
+          if (variable.initLock) {
+            return variable.updateOptions().then(variable.initLock.resolve);
+          }
+          return variable.updateOptions();
         }
 
-        variable.initLock.resolve();
+        if (variable.initLock) {
+          variable.initLock.resolve();
+        }
       })
       .finally(() => {
         this.templateSrv.variableInitialized(variable);
@@ -276,6 +286,25 @@ export class VariableSrv {
     this.templateSrv.fillVariableValuesForUrl(params);
     // update url
     this.$location.search(params);
+  }
+
+  storeUpdated() {
+    const state = store.getState();
+
+    if (state.location.path === this.$location.path()) {
+      const queryParams = this.$location.search();
+      return this.$q
+        .all(
+          this.variables.map(variable => {
+            return this.processVariable(variable, queryParams);
+          })
+        )
+        .then(() => {
+          this.templateSrv.updateIndex();
+          this.dashboard.templateVariableValueUpdated();
+          this.dashboard.startRefresh();
+        });
+    }
   }
 
   setAdhocFilter(options) {
