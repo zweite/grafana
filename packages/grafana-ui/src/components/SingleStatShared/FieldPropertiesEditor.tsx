@@ -49,22 +49,25 @@ export class FieldPropertiesEditor extends PureComponent<Props> {
     return (
       <PanelOptionsGroup title={title}>
         <>
-          <div className="gf-form">
+          <div className="form-field">
             <FormLabel width={labelWidth}>Unit</FormLabel>
-            <UnitPicker defaultValue={unit} onChange={this.onUnitChange} />
+            <div className="form-field-desc">Value calculation (mean, max, last, etc)</div>
+            <UnitPicker defaultValue={unit} onChange={this.onUnitChange} width={15} />
           </div>
           {showMinMax && (
             <>
               <FormField
                 label="Min"
-                labelWidth={labelWidth}
+                description="Minimum value"
+                inputWidth={15}
                 onChange={this.onMinChange}
                 value={toNumberString(min)}
                 type="number"
               />
               <FormField
                 label="Max"
-                labelWidth={labelWidth}
+                description="Maximum value"
+                inputWidth={15}
                 onChange={this.onMaxChange}
                 value={toNumberString(max)}
                 type="number"
@@ -73,6 +76,8 @@ export class FieldPropertiesEditor extends PureComponent<Props> {
           )}
           <FormField
             label="Decimals"
+            className="form-field--has-value"
+            description="Overrides the default decimals handling"
             labelWidth={labelWidth}
             placeholder="auto"
             onChange={this.onDecimalChange}

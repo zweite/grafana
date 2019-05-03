@@ -19,6 +19,7 @@ gf-form-switch[disabled] {
 
 .gf-form-switch-container {
   display: flex;
+  flex-direction: column;
   cursor: pointer;
 }
 
@@ -26,7 +27,7 @@ gf-form-switch[disabled] {
   display: flex;
   position: relative;
   width: 56px;
-  height: $input-height;
+  height: 25px;
   background: $switch-bg;
   border: 1px solid $input-border-color;
   border-left: none;

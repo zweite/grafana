@@ -1,6 +1,6 @@
 import React, { FunctionComponent, ReactNode } from 'react';
 import classNames from 'classnames';
-import { Tooltip } from '../Tooltip/Tooltip';
+// import { Tooltip } from '../Tooltip/Tooltip';
 import { PopperContent } from '../Tooltip/PopperController';
 
 interface Props {
@@ -23,7 +23,7 @@ export const FormLabel: FunctionComponent<Props> = ({
   width,
   ...rest
 }) => {
-  const classes = classNames(`gf-form-label width-${width ? width : '10'}`, className, {
+  const classes = classNames(`gf-form-label`, className, {
     'gf-form-label--is-focused': isFocused,
     'gf-form-label--is-invalid': isInvalid,
   });
@@ -31,13 +31,15 @@ export const FormLabel: FunctionComponent<Props> = ({
   return (
     <label className={classes} {...rest} htmlFor={htmlFor}>
       {children}
-      {tooltip && (
-        <Tooltip placement="top" content={tooltip} theme={'info'}>
-          <div className="gf-form-help-icon gf-form-help-icon--right-normal">
-            <i className="fa fa-info-circle" />
-          </div>
-        </Tooltip>
-      )}
+      <i className="fa fa-cog gf-form-label-cog" />
     </label>
   );
+
+  // {tooltip && (
+  //         <Tooltip placement="top" content={tooltip} theme={'info'}>
+  //           <div className="gf-form-help-icon gf-form-help-icon--right-normal">
+  //             <i className="fa fa-info-circle" />
+  //           </div>
+  //         </Tooltip>
+  //       )}
 };

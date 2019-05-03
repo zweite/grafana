@@ -68,14 +68,18 @@ export class GaugePanelEditor extends PureComponent<PanelEditorProps<GaugeOption
           >
             <Switch
               label="Labels"
+              description="Controls rendering of threshold labels"
               labelClass={`width-${this.labelWidth}`}
               checked={showThresholdLabels}
+              transparent={true}
               onChange={this.onToggleThresholdLabels}
             />
             <Switch
               label="Markers"
+              description="Controls rendering of threshold markers"
               labelClass={`width-${this.labelWidth}`}
               checked={showThresholdMarkers}
+              transparent={true}
               onChange={this.onToggleThresholdMarkers}
             />
           </FieldDisplayEditor>

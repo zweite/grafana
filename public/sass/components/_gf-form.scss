@@ -98,18 +98,15 @@ $input-border: 1px solid $input-border-color;
 }
 
 .gf-form-label {
-  padding: $input-padding;
+  // padding: $input-padding;
   flex-shrink: 0;
   font-weight: $font-weight-semi-bold;
   font-size: $font-size-sm;
+  margin-bottom: 4px;
 
-  background-color: $input-label-bg;
+  // background-color: $input-label-bg;
   display: block;
-  height: $input-height;
-
-  border: $border-width solid $input-label-border-color;
-  border-right: none;
-  border-radius: $label-border-radius;
+  // height: $input-height;
 
   &--grow {
     flex-grow: 1;
@@ -122,7 +119,6 @@ $input-border: 1px solid $input-border-color;
   &--transparent {
     background-color: transparent;
     border: 0;
-    text-align: right;
     padding-left: 0px;
   }
 
@@ -143,6 +139,20 @@ $input-border: 1px solid $input-border-color;
   &:disabled {
     color: $text-color-weak;
   }
+
+  &:hover {
+    .gf-form-label-cog {
+      opacity: 1;
+    }
+  }
+}
+
+.gf-form-label-cog {
+  cursor: pointer;
+  margin-left: 10px;
+  opacity: 0;
+  color: $text-muted;
+  transition: opacity 0.1s ease-in-out;
 }
 
 .gf-form-label + .gf-form-label {

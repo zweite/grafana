@@ -72,7 +72,7 @@ export class FieldDisplayEditor extends PureComponent<Props> {
     const { showPrefixSuffix, options, children } = this.props;
     const { title, stats, prefix, suffix, values, limit } = options;
 
-    const titleTooltip = (
+    const titleTooltip = () => (
       <div>
         Template Variables:
         <br />
@@ -91,16 +91,20 @@ export class FieldDisplayEditor extends PureComponent<Props> {
         <>
           <FormField
             label="Title"
-            labelWidth={labelWidth}
+            inputWidth={20}
+            className="form-field--has-value"
             onChange={this.onTitleChange}
             value={title}
             tooltip={titleTooltip}
             placeholder="Auto"
+            description="Title for each value/field, not the same as panel title."
           />
-          <div className="gf-form">
+          <div className="form-field">
             <FormLabel width={labelWidth}>Show</FormLabel>
+            <div className="form-field-desc">Calculate single value or show all?</div>
             <Select
               options={showOptions}
+              width={20}
               value={values ? showOptions[0] : showOptions[1]}
               onChange={this.onShowValuesChange}
             />
@@ -115,8 +119,9 @@ export class FieldDisplayEditor extends PureComponent<Props> {
               type="number"
             />
           ) : (
-            <div className="gf-form">
+            <div className="form-field">
               <FormLabel width={labelWidth}>Calc</FormLabel>
+              <div className="form-field-desc">Value calculation (mean, max, last, etc)</div>
               <StatsPicker
                 width={12}
                 placeholder="Choose Stat"

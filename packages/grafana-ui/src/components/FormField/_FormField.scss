@@ -1,12 +1,29 @@
 .form-field {
   margin-bottom: $space-xxs;
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   text-align: left;
   position: relative;
+  margin-bottom: 16px;
+  padding-left: 8px;
+  margin-left: -8px;
 
   &--grow {
     flex-grow: 1;
   }
+
+  &--has-value {
+    border-left: 2px solid $blue;
+    border-radius: 3px;
+  }
+}
+
+.form-field-desc {
+  color: $text-muted;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.form-field-label {
+  color: $text-muted;
 }
