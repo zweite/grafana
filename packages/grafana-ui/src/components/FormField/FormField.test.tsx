@@ -16,22 +16,20 @@ const setup = (propOverrides?: Partial<Props>) => {
 };
 
 describe('FormField', () => {
-  it('should render component with default inputRender', () => {
+  it('should render component with default inputEl', () => {
     const wrapper = setup();
 
     expect(wrapper).toMatchSnapshot();
   });
 
-  it('should render component with custom inputRender', () => {
+  it('should render component with custom inputEl', () => {
     const wrapper = setup({
-      inputRender: () => {
-        return (
-          <>
-            <span>Input</span>
-            <button>Ok</button>
-          </>
-        );
-      },
+      inputEl: (
+        <>
+          <span>Input</span>
+          <button>Ok</button>
+        </>
+      ),
     });
 
     expect(wrapper).toMatchSnapshot();

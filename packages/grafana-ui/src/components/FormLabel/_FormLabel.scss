@@ -1,0 +1,15 @@
+.form-label {
+  font-weight: $font-weight-semi-bold;
+  font-size: $font-size-sm;
+  margin-bottom: $space-xs;
+
+  &:disabled {
+    color: $text-color-weak;
+  }
+}
+
+.form-label-description {
+  color: $text-muted;
+  font-size: $font-size-sm;
+  margin-bottom: $space-xs;
+}

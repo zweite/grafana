@@ -1,12 +1,19 @@
 .form-field {
   margin-bottom: $space-xxs;
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   text-align: left;
   position: relative;
+  margin-bottom: $space-md;
+  padding-left: $space-sm;
+  margin-left: -$space-sm;
 
   &--grow {
     flex-grow: 1;
+  }
+
+  &--has-value {
+    border-left: 2px solid $blue;
+    border-radius: 3px;
   }
 }

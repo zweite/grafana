@@ -1,13 +1,12 @@
 import React, { InputHTMLAttributes, FunctionComponent } from 'react';
 import { FormLabel } from '../FormLabel/FormLabel';
-import { PopperContent } from '../Tooltip/PopperController';
 
 export interface Props extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  tooltip?: PopperContent<any>;
+  tooltip?: string | React.ReactNode;
   labelWidth?: number;
   inputWidth?: number;
-  inputRender?: () => React.ReactNode;
+  inputEl?: React.ReactNode;
 }
 
 const defaultProps = {
@@ -24,7 +23,7 @@ export const FormField: FunctionComponent<Props> = ({
   tooltip,
   labelWidth,
   inputWidth,
-  inputRender,
+  inputEl,
   ...inputProps
 }) => {
   return (
@@ -32,8 +31,7 @@ export const FormField: FunctionComponent<Props> = ({
       <FormLabel width={labelWidth} tooltip={tooltip}>
         {label}
       </FormLabel>
-      {inputRender && inputRender()}
-      {!inputRender && <input type="text" className={`gf-form-input width-${inputWidth}`} {...inputProps} />}
+      {inputEl || <input type="text" className={`gf-form-input width-${inputWidth}`} {...inputProps} />}
     </div>
   );
 };
