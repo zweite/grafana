@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -41,20 +41,14 @@ import (
 	"github.com/grafana/grafana/pkg/setting"
 )
 
-func NewGrafanaServer() *GrafanaServerImpl {
-	rootCtx, shutdownFn := context.WithCancel(context.Background())
-	childRoutines, childCtx := errgroup.WithContext(rootCtx)
+type Server struct {
+	configFile  string
+	homePath    string
+	version     string
+	commit      string
+	buildBranch string
+	pidFile     string
 
-	return &GrafanaServerImpl{
-		context:       childCtx,
-		shutdownFn:    shutdownFn,
-		childRoutines: childRoutines,
-		log:           log.New("server"),
-		cfg:           setting.NewCfg(),
-	}
-}
-
-type GrafanaServerImpl struct {
 	context            context.Context
 	shutdownFn         context.CancelFunc
 	childRoutines      *errgroup.Group
@@ -67,7 +61,36 @@ type GrafanaServerImpl struct {
 	HttpServer    *api.HTTPServer       `inject:""`
 }
 
-func (g *GrafanaServerImpl) Run() error {
+type Args struct {
+	ConfigFile  string
+	HomePath    string
+	Version     string
+	Commit      string
+	BuildBranch string
+	PidFile     string
+}
+
+func New(args *Args) *Server {
+	rootCtx, shutdownFn := context.WithCancel(context.Background())
+	childRoutines, childCtx := errgroup.WithContext(rootCtx)
+
+	return &Server{
+		context:       childCtx,
+		shutdownFn:    shutdownFn,
+		childRoutines: childRoutines,
+		log:           log.New("server"),
+		cfg:           setting.NewCfg(),
+
+		configFile:  args.ConfigFile,
+		homePath:    args.HomePath,
+		version:     args.Version,
+		commit:      args.Commit,
+		buildBranch: args.BuildBranch,
+		pidFile:     args.PidFile,
+	}
+}
+
+func (g *Server) Run() error {
 	var err error
 	g.loadConfiguration()
 	g.writePIDFile()
@@ -168,10 +191,10 @@ func (g *GrafanaServerImpl) Run() error {
 	return g.childRoutines.Wait()
 }
 
-func (g *GrafanaServerImpl) loadConfiguration() {
+func (g *Server) loadConfiguration() {
 	err := g.cfg.Load(&setting.CommandLineArgs{
-		Config:   *configFile,
-		HomePath: *homePath,
+		Config:   g.configFile,
+		HomePath: g.homePath,
 		Args:     flag.Args(),
 	})
 
@@ -180,11 +203,12 @@ func (g *GrafanaServerImpl) loadConfiguration() {
 		os.Exit(1)
 	}
 
-	g.log.Info("Starting "+setting.ApplicationName, "version", version, "commit", commit, "branch", buildBranch, "compiled", time.Unix(setting.BuildStamp, 0))
+	g.log.Info(
+		"Starting "+setting.ApplicationName, "version", g.version, "commit", g.commit, "branch", g.buildBranch, "compiled", time.Unix(setting.BuildStamp, 0))
 	g.cfg.LogConfigSources()
 }
 
-func (g *GrafanaServerImpl) Shutdown(reason string) {
+func (g *Server) Shutdown(reason string) {
 	g.log.Info("Shutdown started", "reason", reason)
 	g.shutdownReason = reason
 	g.shutdownInProgress = true
@@ -196,7 +220,7 @@ func (g *GrafanaServerImpl) Shutdown(reason string) {
 	g.childRoutines.Wait()
 }
 
-func (g *GrafanaServerImpl) Exit(reason error) int {
+func (g *Server) Exit(reason error) int {
 	// default exit code is 1
 	code := 1
 
@@ -209,13 +233,13 @@ func (g *GrafanaServerImpl) Exit(reason error) int {
 	return code
 }
 
-func (g *GrafanaServerImpl) writePIDFile() {
-	if *pidFile == "" {
+func (g *Server) writePIDFile() {
+	if g.pidFile == "" {
 		return
 	}
 
 	// Ensure the required directory structure exists.
-	err := os.MkdirAll(filepath.Dir(*pidFile), 0700)
+	err := os.MkdirAll(filepath.Dir(g.pidFile), 0700)
 	if err != nil {
 		g.log.Error("Failed to verify pid directory", "error", err)
 		os.Exit(1)
@@ -223,12 +247,12 @@ func (g *GrafanaServerImpl) writePIDFile() {
 
 	// Retrieve the PID and write it.
 	pid := strconv.Itoa(os.Getpid())
-	if err := ioutil.WriteFile(*pidFile, []byte(pid), 0644); err != nil {
+	if err := ioutil.WriteFile(g.pidFile, []byte(pid), 0644); err != nil {
 		g.log.Error("Failed to write pidfile", "error", err)
 		os.Exit(1)
 	}
 
-	g.log.Info("Writing PID file", "path", *pidFile, "pid", pid)
+	g.log.Info("Writing PID file", "path", g.pidFile, "pid", pid)
 }
 
 func sendSystemdNotification(state string) error {

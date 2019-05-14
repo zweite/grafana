@@ -16,6 +16,7 @@ import (
 	"github.com/grafana/grafana/pkg/extensions"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/infra/metrics"
+	"github.com/grafana/grafana/pkg/infra/server"
 	_ "github.com/grafana/grafana/pkg/services/alerting/conditions"
 	_ "github.com/grafana/grafana/pkg/services/alerting/notifiers"
 	"github.com/grafana/grafana/pkg/setting"
@@ -88,13 +89,20 @@ func main() {
 
 	metrics.SetBuildInformation(version, commit, buildBranch)
 
-	server := NewGrafanaServer()
+	grafana := server.New(&server.Args{
+		ConfigFile:  *configFile,
+		HomePath:    *homePath,
+		Version:     version,
+		Commit:      commit,
+		BuildBranch: buildBranch,
+		PidFile:     *pidFile,
+	})
 
-	go listenToSystemSignals(server)
+	go listenToSystemSignals(grafana)
 
-	err := server.Run()
+	err := grafana.Run()
 
-	code := server.Exit(err)
+	code := grafana.Exit(err)
 	trace.Stop()
 	log.Close()
 
@@ -111,7 +119,7 @@ func validPackaging(packaging string) string {
 	return "unknown"
 }
 
-func listenToSystemSignals(server *GrafanaServerImpl) {
+func listenToSystemSignals(grafana *server.Server) {
 	signalChan := make(chan os.Signal, 1)
 	sighupChan := make(chan os.Signal, 1)
 
@@ -123,7 +131,7 @@ func listenToSystemSignals(server *GrafanaServerImpl) {
 		case <-sighupChan:
 			log.Reload()
 		case sig := <-signalChan:
-			server.Shutdown(fmt.Sprintf("System signal: %s", sig))
+			grafana.Shutdown(fmt.Sprintf("System signal: %s", sig))
 		}
 	}
 }
