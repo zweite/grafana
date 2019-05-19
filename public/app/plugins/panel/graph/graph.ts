@@ -411,6 +411,7 @@ class GraphElement {
           show: panel.lines,
           zero: false,
           fill: this.translateFillOption(panel.fill),
+          fillColor: { colors: [ { opacity: 0.0 }, { opacity: 0.5 } ] },
           lineWidth: panel.dashes ? 0 : panel.linewidth,
           steps: panel.steppedLine,
         },
