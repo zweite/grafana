@@ -72,18 +72,6 @@
 }
 
 .panel-in-fullscreen {
-  .sidemenu {
-    display: none;
-  }
-
-  .dashboard-container {
-    padding: 0;
-  }
-
-  .submenu-controls {
-    padding: 0 $dashboard-padding $space-sm $dashboard-padding;
-  }
-
   .search-container {
     left: 0 !important;
   }
