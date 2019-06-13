@@ -21,25 +21,21 @@
   }
 }
 
-.panel-editor-container__editor {
+.panel-editor-container__query {
   margin-top: $space-lg;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex: 1 1 0;
   position: relative;
   min-height: 0;
+  background: $page-bg;
+  margin: $space-md $dashboard-padding;
 }
 
-.panel-editor__right {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  background: $input-bg;
-  margin: 0 20px 0 84px;
-  width: calc(100% - 84px);
-  border-radius: 3px;
-  box-shadow: $panel-editor-shadow;
-  min-height: 0;
+.panel-edit-header {
+  background: $side-menu-bg;
+  box-shadow: $side-menu-shadow;
+  margin-bottom: $dashboard-padding;
 }
 
 .panel-editor__close {
@@ -74,6 +70,10 @@
 .panel-in-fullscreen {
   .search-container {
     left: 0 !important;
+  }
+
+  .panel-title-container {
+    display: none;
   }
 }
 

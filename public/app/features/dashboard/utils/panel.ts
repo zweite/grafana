@@ -174,7 +174,7 @@ export function getResolution(panel: PanelModel): number {
 export function calculateInnerPanelHeight(panel: PanelModel, containerHeight: number): number {
   return (
     containerHeight -
-    (panel.hasTitle() ? config.theme.panelHeaderHeight : 0) -
+    (panel.hasTitle() && !panel.isEditing ? config.theme.panelHeaderHeight : 0) -
     config.theme.panelPadding * 2 -
     PANEL_BORDER
   );

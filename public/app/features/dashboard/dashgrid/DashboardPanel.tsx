@@ -12,6 +12,7 @@ import { DashboardRow } from '../components/DashboardRow';
 import { PanelChrome } from './PanelChrome';
 import { PanelEditor } from '../panel_editor/PanelEditor';
 import { PanelResizer } from './PanelResizer';
+import { PanelEditHeader } from '../panel_editor/PanelEditHeader';
 
 // Types
 import { PanelModel, DashboardModel } from '../state';
@@ -191,6 +192,7 @@ export class DashboardPanel extends PureComponent<Props, State> {
 
     return (
       <div className={editorContainerClasses}>
+        {panel.isEditing && <PanelEditHeader panel={panel} />}
         <PanelResizer
           isEditing={isEditing}
           panel={panel}

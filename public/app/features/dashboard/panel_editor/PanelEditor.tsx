@@ -118,45 +118,6 @@ export class PanelEditor extends PureComponent<PanelEditorProps> {
       tabs.push(getPanelEditorTab(PanelEditorTabIds.Alert));
     }
 
-    return (
-      <div className="panel-editor-container__editor">
-        <div className="navbar">
-          <div className="navbar__spacer" />
-          <div className="navbar-buttons">
-            <button className="btn navbar-button navbar-button--settings">
-              Graph
-              <i className="fa fa-caret-down" />
-            </button>
-            <button className="btn navbar-button navbar-button--settings">
-              <i className="gicon gicon-cog" />
-            </button>
-          </div>
-        </div>
-        <div className="panel-editor__right">{this.renderCurrentTab(activeTab)}</div>
-      </div>
-    );
+    return <div className="panel-editor-container__query">{this.renderCurrentTab(activeTab)}</div>;
   }
-}
-
-interface TabItemParams {
-  tab: PanelEditorTab;
-  activeTab: string;
-  onClick: (tab: PanelEditorTab) => void;
-}
-
-function TabItem({ tab, activeTab, onClick }: TabItemParams) {
-  const tabClasses = classNames({
-    'panel-editor-tabs__link': true,
-    active: activeTab === tab.id,
-  });
-
-  return (
-    <div className="panel-editor-tabs__item" onClick={() => onClick(tab)}>
-      <a className={tabClasses} aria-label={`${tab.text} tab button`}>
-        <Tooltip content={`${tab.text}`} placement="auto">
-          <i className={`gicon gicon-${tab.id}${activeTab === tab.id ? '-active' : ''}`} />
-        </Tooltip>
-      </a>
-    </div>
-  );
 }
