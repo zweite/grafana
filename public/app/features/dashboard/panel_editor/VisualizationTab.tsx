@@ -213,37 +213,17 @@ export class VisualizationTab extends PureComponent<Props, State> {
   };
 
   render() {
-    const { plugin } = this.props;
-    const { isVizPickerOpen, searchQuery, scrollTop } = this.state;
-    const { meta } = plugin;
+    // const { plugin } = this.props;
+    // const { isVizPickerOpen, searchQuery, scrollTop } = this.state;
+    // const { meta } = plugin;
+    //
+    // const pluginHelp: EditorToolbarView = {
+    //   heading: 'Help',
+    //   icon: 'fa fa-question',
+    //   render: this.renderHelp,
+    // };
 
-    const pluginHelp: EditorToolbarView = {
-      heading: 'Help',
-      icon: 'fa fa-question',
-      render: this.renderHelp,
-    };
-
-    return (
-      <EditorTabBody
-        heading="Visualization"
-        renderToolbar={this.renderToolbar}
-        toolbarItems={[pluginHelp]}
-        scrollTop={scrollTop}
-        setScrollTop={this.setScrollTop}
-      >
-        <>
-          <FadeIn in={isVizPickerOpen} duration={200} unmountOnExit={true} onExited={this.clearQuery}>
-            <VizTypePicker
-              current={meta}
-              onTypeChanged={this.onTypeChanged}
-              searchQuery={searchQuery}
-              onClose={this.onCloseVizPicker}
-            />
-          </FadeIn>
-          {this.renderPanelOptions()}
-        </>
-      </EditorTabBody>
-    );
+    return this.renderPanelOptions();
   }
 }
 

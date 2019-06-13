@@ -10,9 +10,7 @@ import { importPanelPlugin } from 'app/features/plugins/plugin_loader';
 import { AddPanelWidget } from '../components/AddPanelWidget';
 import { DashboardRow } from '../components/DashboardRow';
 import { PanelChrome } from './PanelChrome';
-import { PanelEditor } from '../panel_editor/PanelEditor';
-import { PanelResizer } from './PanelResizer';
-import { PanelEditHeader } from '../panel_editor/PanelEditHeader';
+import { PanelEditor } from '../panel_editor/PanelEditor2';
 
 // Types
 import { PanelModel, DashboardModel } from '../state';
@@ -179,43 +177,19 @@ export class DashboardPanel extends PureComponent<Props, State> {
       return null;
     }
 
-    const editorContainerClasses = classNames({
-      'panel-editor-container': isEditing,
-      'panel-height-helper': !isEditing,
-    });
-
-    const panelWrapperClass = classNames({
-      'panel-wrapper': true,
-      'panel-wrapper--edit': isEditing,
-      'panel-wrapper--view': isFullscreen && !isEditing,
-    });
-
     return (
-      <div className={editorContainerClasses}>
-        {panel.isEditing && <PanelEditHeader panel={panel} />}
-        <PanelResizer
-          isEditing={isEditing}
+      <div className="panel-height-helper" onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave}>
+        <PanelEditor
           panel={panel}
-          render={styles => (
-            <div
-              className={panelWrapperClass}
-              onMouseEnter={this.onMouseEnter}
-              onMouseLeave={this.onMouseLeave}
-              style={styles}
-            >
-              {this.renderPanel()}
-            </div>
-          )}
-        />
-        {panel.isEditing && (
-          <PanelEditor
-            panel={panel}
-            plugin={plugin}
-            dashboard={dashboard}
-            angularPanel={angularPanel}
-            onTypeChanged={this.onPluginTypeChanged}
-          />
-        )}
+          dashboard={dashboard}
+          isFullscreen={isFullscreen}
+          isEditing={isEditing}
+          plugin={plugin}
+          angularPanel={angularPanel}
+          onTypeChanged={this.onPluginTypeChanged}
+        >
+          {this.renderPanel()}
+        </PanelEditor>
       </div>
     );
   }
