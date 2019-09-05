@@ -13,6 +13,13 @@ import (
 	"github.com/grafana/grafana/pkg/tsdb"
 )
 
+type grafanaService struct{}
+
+func (*grafanaService) QueryDatasource(ctx context.Context, req *datasource.QueryDatasourceRequest) (*datasource.QueryDatasourceResponse, error) {
+
+	return nil, nil
+}
+
 func NewDatasourcePluginWrapper(log log.Logger, plugin datasource.DatasourcePlugin) *DatasourcePluginWrapper {
 	return &DatasourcePluginWrapper{DatasourcePlugin: plugin, logger: log}
 }
@@ -58,7 +65,7 @@ func (tw *DatasourcePluginWrapper) Query(ctx context.Context, ds *models.DataSou
 		})
 	}
 
-	pbres, err := tw.DatasourcePlugin.Query(ctx, pbQuery)
+	pbres, err := tw.DatasourcePlugin.Query(ctx, pbQuery, &grafanaService{})
 
 	if err != nil {
 		return nil, err
