@@ -19,7 +19,7 @@ type grafanaAPI struct {
 
 func (s *grafanaAPI) QueryDatasource(ctx context.Context, req *datasource.QueryDatasourceRequest) (*datasource.QueryDatasourceResponse, error) {
 	s.logger.Info("Hello from bi-directional call", "req", req)
-	return nil, nil
+	return &datasource.QueryDatasourceResponse{}, nil
 }
 
 func NewDatasourcePluginWrapper(log log.Logger, plugin datasource.DatasourcePlugin) *DatasourcePluginWrapper {
