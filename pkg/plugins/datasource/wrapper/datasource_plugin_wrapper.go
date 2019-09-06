@@ -13,10 +13,12 @@ import (
 	"github.com/grafana/grafana/pkg/tsdb"
 )
 
-type grafanaService struct{}
+type grafanaAPI struct {
+	logger log.Logger
+}
 
-func (*grafanaService) QueryDatasource(ctx context.Context, req *datasource.QueryDatasourceRequest) (*datasource.QueryDatasourceResponse, error) {
-
+func (s *grafanaAPI) QueryDatasource(ctx context.Context, req *datasource.QueryDatasourceRequest) (*datasource.QueryDatasourceResponse, error) {
+	s.logger.Info("Hello from bi-directional call", "req", req)
 	return nil, nil
 }
 
@@ -65,7 +67,7 @@ func (tw *DatasourcePluginWrapper) Query(ctx context.Context, ds *models.DataSou
 		})
 	}
 
-	pbres, err := tw.DatasourcePlugin.Query(ctx, pbQuery, &grafanaService{})
+	pbres, err := tw.DatasourcePlugin.Query(ctx, pbQuery, &grafanaAPI{logger: tw.logger})
 
 	if err != nil {
 		return nil, err
