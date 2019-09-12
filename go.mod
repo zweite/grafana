@@ -35,7 +35,7 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20190411002643-bd77b112433e // indirect
 	github.com/gorilla/websocket v1.4.0
 	github.com/gosimple/slug v1.4.2
-	github.com/grafana/grafana-plugin-model v0.0.0-20190906002829-a7284adfb995
+	github.com/grafana/grafana-plugin-model v0.0.0-20190912153323-57db2b6f6303
 	github.com/hashicorp/go-hclog v0.8.0
 	github.com/hashicorp/go-plugin v0.0.0-20190220160451-3f118e8ee104
 	github.com/hashicorp/go-version v1.1.0
