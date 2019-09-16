@@ -6,20 +6,100 @@ import (
 	"fmt"
 
 	"github.com/grafana/grafana-plugin-model/go/datasource"
+	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/components/null"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/models"
+	"github.com/grafana/grafana/pkg/services/datasources"
 	"github.com/grafana/grafana/pkg/tsdb"
 )
 
 type grafanaAPI struct {
-	logger log.Logger
+	logger          log.Logger
+	DatasourceCache datasources.CacheService `inject:""`
 }
 
 func (s *grafanaAPI) QueryDatasource(ctx context.Context, req *datasource.QueryDatasourceRequest) (*datasource.QueryDatasourceResponse, error) {
-	s.logger.Info("Hello from bi-directional call", "req", req)
-	return &datasource.QueryDatasourceResponse{}, nil
+	if len(req.Queries) == 0 {
+		return nil, fmt.Errorf("zero queries found in datasource request")
+	}
+
+	getDsInfo := &models.GetDataSourceByIdQuery{
+		Id:    req.DatasourceId,
+		OrgId: req.OrgId,
+	}
+
+	if err := bus.Dispatch(getDsInfo); err != nil {
+		return nil, fmt.Errorf("Could not find datasource %v", err)
+	}
+
+	// Convert plugin-model (datasource) queries to tsdb queries
+	queries := make([]*tsdb.Query, len(req.Queries))
+	for i, query := range req.Queries {
+		sj, err := simplejson.NewJson([]byte(query.ModelJson))
+		if err != nil {
+			return nil, err
+		}
+		queries[i] = &tsdb.Query{
+			RefId:         query.RefId,
+			IntervalMs:    query.IntervalMs,
+			MaxDataPoints: query.MaxDataPoints,
+			Model:         sj,
+		}
+	}
+
+	timeRange := tsdb.NewTimeRange(req.TimeRange.FromRaw, req.TimeRange.ToRaw)
+	tQ := &tsdb.TsdbQuery{
+		TimeRange: timeRange,
+		Queries:   queries,
+	}
+
+	// Execute the converted queries
+	tsdbRes, err := tsdb.HandleRequest(ctx, getDsInfo.Result, tQ)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert tsdb results (map) to plugin-model/datasource (slice) results
+	// Only error and Series responses mapped.
+	results := make([]*datasource.QueryResult, len(tsdbRes.Results))
+	resIdx := 0
+	for refID, res := range tsdbRes.Results {
+		qr := &datasource.QueryResult{
+			RefId: refID,
+		}
+		if res.Error != nil {
+			qr.Error = res.ErrorString
+			results[resIdx] = qr
+			resIdx++
+			continue
+		}
+
+		newSeries := make([]*datasource.TimeSeries, len(res.Series))
+		for sIdx, series := range res.Series {
+			points := make([]*datasource.Point, len(series.Points))
+			for i, p := range series.Points {
+				point := &datasource.Point{
+					Timestamp: int64(p[1].Float64),
+					Value:     p[0].Float64,
+				}
+				points[i] = point
+			}
+
+			newSeries[sIdx] = &datasource.TimeSeries{
+				Name:   series.Name,
+				Points: points,
+				Tags:   series.Tags,
+			}
+
+		}
+		qr.Series = newSeries
+		results[resIdx] = qr
+
+		resIdx++
+	}
+	return &datasource.QueryDatasourceResponse{Results: results}, nil
 }
 
 func NewDatasourcePluginWrapper(log log.Logger, plugin datasource.DatasourcePlugin) *DatasourcePluginWrapper {
@@ -117,6 +197,10 @@ func (tw *DatasourcePluginWrapper) Query(ctx context.Context, ds *models.DataSou
 			return nil, err
 		}
 		qr.Tables = mappedTables
+
+		if r.Frames != nil {
+			qr.Frames = r.Frames
+		}
 
 		res.Results[r.RefId] = qr
 	}
