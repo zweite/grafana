@@ -1,6 +1,7 @@
 import { actionCreatorFactory, noPayloadActionCreatorFactory } from 'app/core/redux';
 import config from 'app/core/config';
-import { ThunkResult, SyncInfo, LdapUser, LdapConnectionInfo, LdapError, UserSession, User } from 'app/types';
+import { getBackendSrv } from '@grafana/runtime';
+import { ThunkResult, SyncInfo, LdapUser, LdapConnectionInfo, LdapError, UserSession, User, UserDTO } from 'app/types';
 import {
   getUserInfo,
   getLdapState,
@@ -29,6 +30,8 @@ export const userSessionsLoadedAction = actionCreatorFactory<UserSession[]>('USE
 export const userSyncFailedAction = noPayloadActionCreatorFactory('USER_SYNC_FAILED').create();
 export const revokeUserSessionAction = noPayloadActionCreatorFactory('REVOKE_USER_SESSION').create();
 export const revokeAllUserSessionsAction = noPayloadActionCreatorFactory('REVOKE_ALL_USER_SESSIONS').create();
+
+export const userProfileLoadedAction = actionCreatorFactory<UserDTO>('admin/USER_PROFILE_LOADED').create();
 
 // Actions
 
@@ -133,5 +136,14 @@ export function revokeAllSessions(userId: number): ThunkResult<void> {
   return async dispatch => {
     await revokeAllUserSessions(userId);
     dispatch(loadUserSessions(userId));
+  };
+}
+
+// UserAdminPage
+
+export function loadUserProfile(userId: number): ThunkResult<void> {
+  return async dispatch => {
+    const user = await getBackendSrv().get('/api/users/' + userId);
+    dispatch(userProfileLoadedAction(user));
   };
 }

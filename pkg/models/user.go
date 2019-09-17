@@ -226,6 +226,7 @@ type UserProfileDTO struct {
 	IsExternal     bool      `json:"isExternal"`
 	AuthLabels     []string  `json:"authLabels"`
 	UpdatedAt      time.Time `json:"updatedAt"`
+	AvatarUrl      string    `json:"avatarUrl"`
 }
 
 type UserSearchHitDTO struct {
