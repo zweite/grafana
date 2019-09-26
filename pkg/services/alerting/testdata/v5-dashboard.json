@@ -20,6 +20,7 @@
           "name": "name1",
           "message": "desc1",
           "handler": 1,
+          "matchSerie": 1,
           "frequency": "60s",
           "conditions": [
           {
@@ -44,6 +45,7 @@
           "message": "desc2",
           "handler": 0,
           "frequency": "60s",
+          "matchSerie": 1,
           "severity": "warning",
           "conditions": [
           {

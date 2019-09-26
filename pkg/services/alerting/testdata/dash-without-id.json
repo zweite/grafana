@@ -39,6 +39,7 @@
                 }
               ],
               "frequency": "3s",
+              "matchSerie": 1,
               "handler": 1,
               "name": "Influxdb",
               "noDataState": "no_data",
