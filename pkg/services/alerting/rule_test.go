@@ -76,6 +76,7 @@ func TestAlertRuleModel(t *testing.T) {
 					"noDataMode": "critical",
 					"enabled": true,
 					"frequency": "60s",
+					"matchSerie": 1,
 					"conditions": [
 						{
 							"type": "test",
@@ -122,6 +123,7 @@ func TestAlertRuleModel(t *testing.T) {
 				"noDataMode": "critical",
 				"enabled": true,
 				"frequency": "0s",
+				"matchSerie": 1,
 				"conditions": [ { "type": "test", "prop": 123 } ],
 				"notifications": []
 			}`
@@ -152,6 +154,7 @@ func TestAlertRuleModel(t *testing.T) {
 				"noDataMode": "critical",
 				"enabled": true,
 				"frequency": "60s",
+				"matchSerie": 1,
 				"conditions": [
 					{
 						"type": "test",
