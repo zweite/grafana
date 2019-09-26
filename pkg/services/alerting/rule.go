@@ -33,6 +33,7 @@ type Rule struct {
 	NoDataState         models.NoDataOption
 	ExecutionErrorState models.ExecutionErrorOption
 	State               models.AlertStateType
+	MatchSerie          int
 	Conditions          []Condition
 	Notifications       []string
 	AlertRuleTags       []*models.Tag
@@ -166,6 +167,11 @@ func NewRuleFromDBAlert(ruleDef *models.Alert) (*Rule, error) {
 		return nil, ValidationError{Reason: "Alert is missing conditions"}
 	}
 
+	matchSerie, err := ruleDef.Settings.Get("matchSerie").Int()
+	if err != nil {
+		return nil, ValidationError{Reason: "MatchSerie is not a number"}
+	}
+	model.MatchSerie = matchSerie
 	return model, nil
 }
 
