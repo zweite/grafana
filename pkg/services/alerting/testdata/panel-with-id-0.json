@@ -23,6 +23,7 @@
         "message": "desc1",
         "handler": 1,
         "frequency": "60s",
+        "matchSerie": 1,
         "conditions": [
         {
           "type": "query",
@@ -46,6 +47,7 @@
         "message": "desc2",
         "handler": 0,
         "frequency": "60s",
+        "matchSerie": 1,
         "severity": "warning",
         "conditions": [
         {

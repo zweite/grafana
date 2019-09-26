@@ -27,8 +27,11 @@ func NewEvalHandler() *DefaultEvalHandler {
 func (e *DefaultEvalHandler) Eval(context *EvalContext) {
 	firing := true
 	noDataFound := true
+	firings := make([]bool, 0, 10)
+	noDataFounds := make([]bool, 0, 10)
 	conditionEvals := ""
 
+	evalMatches := make(map[string][]*EvalMatch)
 	for i := 0; i < len(context.Rule.Conditions); i++ {
 		condition := context.Rule.Conditions[i]
 		cr, err := condition.Eval(context)
@@ -38,33 +41,74 @@ func (e *DefaultEvalHandler) Eval(context *EvalContext) {
 
 		// break if condition could not be evaluated
 		if context.Error != nil {
-			break
+			goto END
 		}
 
-		if i == 0 {
-			firing = cr.Firing
-			noDataFound = cr.NoDataFound
+		for j := 0; j < len(cr.EvalMatches); j++ {
+			evalMatch := cr.EvalMatches[j]
+			evalMatches[evalMatch.Metric] = append(evalMatches[evalMatch.Metric], &EvalMatch{
+				Metric:   evalMatch.Metric,
+				Tags:     evalMatch.Tags,
+				Value:    evalMatch.Value,
+				Firing:   evalMatch.Firing,
+				Valid:    evalMatch.Valid,
+				Operator: cr.Operator,
+			})
 		}
-
-		// calculating Firing based on operator
-		if cr.Operator == "or" {
-			firing = firing || cr.Firing
-			noDataFound = noDataFound || cr.NoDataFound
-		} else {
-			firing = firing && cr.Firing
-			noDataFound = noDataFound && cr.NoDataFound
-		}
-
-		if i > 0 {
-			conditionEvals = "[" + conditionEvals + " " + strings.ToUpper(cr.Operator) + " " + strconv.FormatBool(cr.Firing) + "]"
-		} else {
-			conditionEvals = strconv.FormatBool(firing)
-		}
-
-		context.EvalMatches = append(context.EvalMatches, cr.EvalMatches...)
 	}
 
-	context.ConditionEvals = conditionEvals + " = " + strconv.FormatBool(firing)
+	for metric, serieEvalMatches := range evalMatches {
+		metricFiring := true
+		metricNoDataFound := true
+		metricConditionEvals := ""
+		for i := 0; i < len(serieEvalMatches); i++ {
+			serieEvalMatch := serieEvalMatches[i]
+			if i == 0 {
+				metricFiring = serieEvalMatch.Firing
+				metricNoDataFound = !serieEvalMatch.Valid
+			}
+
+			if serieEvalMatch.Operator == "or" {
+				metricFiring = metricFiring || serieEvalMatch.Firing
+				metricNoDataFound = metricNoDataFound || !serieEvalMatch.Valid
+			} else {
+				metricFiring = metricFiring && serieEvalMatch.Firing
+				metricNoDataFound = metricNoDataFound && !serieEvalMatch.Valid
+			}
+
+			if i > 0 {
+				metricConditionEvals = "[" + metricConditionEvals + " " + strings.ToUpper(serieEvalMatch.Operator) + " " + strconv.FormatBool(serieEvalMatch.Firing) + "]"
+			} else {
+				metricConditionEvals = strconv.FormatBool(metricFiring)
+			}
+		}
+
+		metricConditionEvals = metric + ": " + metricConditionEvals
+
+		if metricFiring {
+			firings = append(firings, metricFiring)
+		}
+		noDataFounds = append(noDataFounds, metricNoDataFound)
+
+		if conditionEvals == "" {
+			conditionEvals = "{" + metricConditionEvals + "}"
+		} else {
+			conditionEvals = conditionEvals + ", {" + metricConditionEvals + "}"
+		}
+		// The number of curves that satisfy the condition
+		context.EvalMatches = append(context.EvalMatches, serieEvalMatches...)
+	}
+
+	if len(firings) < context.Rule.MatchSerie {
+		firing = false
+	}
+
+	for _, metricNoDataFound := range noDataFounds {
+		noDataFound = noDataFound && metricNoDataFound
+	}
+
+END:
+	context.ConditionEvals = conditionEvals + " = " + strconv.FormatBool(firing) + " and matchSerie=" + strconv.Itoa(context.Rule.MatchSerie)
 	context.Firing = firing
 	context.NoDataFound = noDataFound
 	context.EndTime = time.Now()
