@@ -182,6 +182,7 @@ export class AlertTabCtrl {
       alert.conditions.push(this.buildDefaultCondition());
     }
 
+    alert.matchSerie = alert.matchSerie || 1;
     alert.noDataState = alert.noDataState || config.alertingNoDataOrNullValues;
     alert.executionErrorState = alert.executionErrorState || config.alertingErrorOrTimeout;
     alert.frequency = alert.frequency || '1m';
