@@ -169,7 +169,7 @@ func NewRuleFromDBAlert(ruleDef *models.Alert) (*Rule, error) {
 
 	matchSerie, err := ruleDef.Settings.Get("matchSerie").Int()
 	if err != nil {
-		return nil, ValidationError{Reason: "MatchSerie is not a number"}
+		matchSerie = 1
 	}
 	model.MatchSerie = matchSerie
 	return model, nil

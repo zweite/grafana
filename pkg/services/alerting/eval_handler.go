@@ -85,18 +85,18 @@ func (e *DefaultEvalHandler) Eval(context *EvalContext) {
 
 		metricConditionEvals = metric + ": " + metricConditionEvals
 
+		noDataFounds = append(noDataFounds, metricNoDataFound)
 		if metricFiring {
 			firings = append(firings, metricFiring)
-		}
-		noDataFounds = append(noDataFounds, metricNoDataFound)
+			if conditionEvals == "" {
+				conditionEvals = "{" + metricConditionEvals + "}"
+			} else {
+				conditionEvals = conditionEvals + ", {" + metricConditionEvals + "}"
+			}
 
-		if conditionEvals == "" {
-			conditionEvals = "{" + metricConditionEvals + "}"
-		} else {
-			conditionEvals = conditionEvals + ", {" + metricConditionEvals + "}"
+			// The number of curves that satisfy the condition
+			context.EvalMatches = append(context.EvalMatches, serieEvalMatches...)
 		}
-		// The number of curves that satisfy the condition
-		context.EvalMatches = append(context.EvalMatches, serieEvalMatches...)
 	}
 
 	if len(firings) < context.Rule.MatchSerie {
