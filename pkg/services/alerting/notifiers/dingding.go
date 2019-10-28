@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/components/simplejson"
@@ -91,6 +92,8 @@ func (dd *DingDingNotifier) Notify(evalContext *alerting.EvalContext) error {
 	for i, match := range evalContext.EvalMatches {
 		message += fmt.Sprintf("\\n%2d. %s: %s", i+1, match.Metric, match.Value)
 	}
+
+	message += time.Now().Format("2006-01-02 15:04:05")
 
 	var bodyStr string
 	if dd.MsgType == "actionCard" {

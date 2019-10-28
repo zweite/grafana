@@ -94,7 +94,7 @@ func (c *EvalContext) GetDurationMs() float64 {
 
 // GetNotificationTitle returns the title of the alert rule including alert state.
 func (c *EvalContext) GetNotificationTitle() string {
-	return "[" + c.GetStateModel().Text + "] " + c.Rule.Name
+	return "[" + c.GetStateModel().Text + "] " + c.GetStateModel().Text + " " + c.Rule.Name
 }
 
 // GetDashboardUID returns the dashboard uid for the alert rule.

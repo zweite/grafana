@@ -3,6 +3,10 @@ FROM golang:1.12.9-alpine
 
 RUN apk add --no-cache gcc g++
 
+ARG TZ="Asia/Shanghai"
+ENV TZ ${TZ}
+RUN apk upgrade --update && apk add bash tzdata curl && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
+
 WORKDIR $GOPATH/src/github.com/grafana/grafana
 
 COPY go.mod go.sum ./
